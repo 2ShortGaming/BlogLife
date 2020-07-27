@@ -1,0 +1,146 @@
+﻿@using BlogLife.Models
+@model  BlogPost
+
+<section class="blog-section spad">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="blog-post single-post">
+                    <img src="img/blog/1.jpg" alt="">
+                    <div class="post-date">@Model.Created.ToString("MMM dd, yyyy")</div>
+                    <h3>@Model.Title</h3>
+                    <div class="post-metas">
+                        <div class="post-meta">By Brandon Swaney</div>
+                        @*<div class="post-meta">in <a href="#">Games</a></div>*@
+                        <div class="post-meta">@Model.Comments.Count Comments</div>
+                    </div>
+                    <p>@Html.Raw(Model.Body)</p>
+                    
+                    <div class="comments">
+                        <h5>Comments (@Model.Comments.Count)</h5>
+                        <ul class="comments-list">
+                            @foreach(var comment in Model.Comments)
+                            {
+                            <li>
+                                <img src="img/author-thumbs/1.jpg" alt="">
+                                <div class="comment-text">
+                                    <h6>@comment.AuthorId<a href="#" class="reply">Reply</a></h6>
+                                    <div class="comment-date">@comment.Created.ToString("MMM dd, yyyy")</div>
+                                    <p>@comment.Body</p>
+                                </div>
+                            </li>
+                            }
+                       </ul> 
+                       
+                        <h5>Leave a comment</h5>
+                        <form class="comment-form">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <input type="text" placeholder="Your name">
+                                </div>
+                                <div class="col-md-6">
+                                    <input type="text" placeholder="Your e-mail">
+                                </div>
+                                <div class="col-md-12">
+                                    <textarea placeholder="Your message"></textarea>
+                                    <button class="site-btn">post Comment</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 sidebar">
+                <div class="sb-widget">
+                    <form class="sb-search">
+                        <input type="text" placeholder="Search">
+                    </form>
+                </div>
+                <div class="sb-widget">
+                    <h2 class="sb-title">Categories</h2>
+                    <ul class="sb-cata-list">
+                        <li><a href="">Games<span>20</span></a></li>
+                        <li><a href="">Gaming Tips & Tricks<span>23</span></a></li>
+                        <li><a href="">Online Games<span>25</span></a></li>
+                        <li><a href="">Team Games<span>17</span></a></li>
+                        <li><a href="">Community<span>15</span></a></li>
+                        <li><a href="">Uncategorized<span>22</span></a></li>
+                    </ul>
+                </div>
+                <div class="sb-widget">
+                    <h2 class="sb-title">Latest News</h2>
+                    <div class="latest-news-widget">
+                        <div class="ln-item">
+                            <img src="img/blog-thumbs/1.jpg" alt="">
+                            <div class="ln-text">
+                                <div class="ln-date">April 1, 2019</div>
+                                <h6>10 Amazing new games</h6>
+                                <div class="ln-metas">
+                                    <div class="ln-meta">By Admin</div>
+                                    <div class="ln-meta">in <a href="#">Games</a></div>
+                                    <div class="ln-meta">3 Comments</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ln-item">
+                            <img src="img/blog-thumbs/2.jpg" alt="">
+                            <div class="ln-text">
+                                <div class="ln-date">April 1, 2019</div>
+                                <h6>10 Amazing new games</h6>
+                                <div class="ln-metas">
+                                    <div class="ln-meta">By Admin</div>
+                                    <div class="ln-meta">in <a href="#">Games</a></div>
+                                    <div class="ln-meta">3 Comments</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ln-item">
+                            <img src="img/blog-thumbs/3.jpg" alt="">
+                            <div class="ln-text">
+                                <div class="ln-date">April 1, 2019</div>
+                                <h6>10 Amazing new games</h6>
+                                <div class="ln-metas">
+                                    <div class="ln-meta">By Admin</div>
+                                    <div class="ln-meta">in <a href="#">Games</a></div>
+                                    <div class="ln-meta">3 Comments</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ln-item">
+                            <img src="img/blog-thumbs/4.jpg" alt="">
+                            <div class="ln-text">
+                                <div class="ln-date">April 1, 2019</div>
+                                <h6>10 Amazing new games</h6>
+                                <div class="ln-metas">
+                                    <div class="ln-meta">By Admin</div>
+                                    <div class="ln-meta">in <a href="#">Games</a></div>
+                                    <div class="ln-meta">3 Comments</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="sb-widget">
+                    <a href="#" class="add">
+                        <img src="img/add-2.jpg" alt="">
+                    </a>
+                </div>
+                <div class="sb-widget">
+                    <h2 class="sb-title">Latest Comments</h2>
+                    <div class="latest-comments-widget">
+                        @foreach (var com in Model.Comments)
+                        {
+                        <div class="lc-item">
+                            <img src="img/author-thumbs/1.jpg" alt="">
+                            <div class="lc-text">
+                                <h6>@com.AuthorId<span> In </span><a href="">Title Name</a></h6>
+                                <div class="lc-date">@com.Created.ToString("MMM dd, yyyy")</div>
+                            </div>
+                        </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

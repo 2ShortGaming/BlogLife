@@ -1,0 +1,79 @@
+﻿@model IEnumerable<BlogLife.Models.BlogPost>
+@{
+    ViewBag.Title = "Index";
+}
+<h2>Index</h2>
+<br />
+<br />
+<br />
+<br />
+<p>
+    @if (User.IsInRole("Admin"))
+    {
+        @Html.ActionLink("Create New", "Create", null, new { @class = "btn btn-dark"})
+    }
+    
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Title)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Slug)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Body)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Abstract)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.MediaPath)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Created)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Updated)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Published)
+        </th>
+        <th></th>
+    </tr>
+    @foreach (var blogPost in Model)
+    {
+<tr>
+    <td>
+        @Html.DisplayFor(modelItem => blogPost.Title)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => blogPost.Slug)
+    </td>
+    <td>
+        @Html.Raw(blogPost.Body)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => blogPost.Abstract)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => blogPost.MediaPath)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => blogPost.Created)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => blogPost.Updated)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => blogPost.Published)
+    </td>
+    <td>
+        @Html.ActionLink("Edit", "Edit", new { id = blogPost.Id }) |
+        @Html.ActionLink("Details", "Details", new { id = blogPost.Id }) |
+        @Html.ActionLink("Delete", "Delete", new { id = blogPost.Id })
+    </td>
+</tr>
+    }
+</table>

@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using BlogLife.Helpers;
 using BlogLife.Models;
+using PagedList;
+using PagedList.Mvc;
 
 namespace BlogLife.Controllers
 {
@@ -16,11 +19,37 @@ namespace BlogLife.Controllers
         private ApplicationDbContext db = new ApplicationDbContext();
 
         // GET: BlogPosts
-        [Authorize(Roles = "Admin")]
-        public ActionResult Index()
+        //[Authorize(Roles = "Admin")]
+        public ActionResult Index(int? page, string searchStr)
         {
-            var allBlogPosts = db.BlogPosts.ToList();
+            ViewBag.Search = searchStr;
+            var blogList = IndexSearch(searchStr);
+
+            int pageSize = 5; //specifies the number of post per page
+            int pageNumber = (page ?? 1);//?? null coalescing operator
+
+            IPagedList<BlogPost> allBlogPosts = blogList.ToPagedList(pageNumber, pageSize);
             return View(allBlogPosts);
+        }
+        public IQueryable<BlogPost> IndexSearch(string searchStr)
+        {
+            IQueryable<BlogPost> result = null;
+            if (searchStr != null)
+            {
+                result = db.BlogPosts.AsQueryable();
+                result = result.Where(b => b.Title.Contains(searchStr) ||
+                    b.Body.Contains(searchStr) ||
+                    b.Comments.Any(c => c.Body.Contains(searchStr) ||
+                        c.Author.FirstName.Contains(searchStr) ||
+                        c.Author.LastName.Contains(searchStr) ||
+                        c.Author.DisplayName.Contains(searchStr) ||
+                        c.Author.Email.Contains(searchStr)));
+            }
+            else
+            {
+                result = db.BlogPosts.AsQueryable();
+            }
+            return result.OrderByDescending(b => b.Created);
         }
 
         // GET: BlogPosts/Details/5
@@ -31,11 +60,56 @@ namespace BlogLife.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
             BlogPost blogPost = db.BlogPosts.FirstOrDefault(b => b.Slug == slug);
+            BlogPost previousPost = db.BlogPosts.OrderByDescending(b => b.Created).ToList().SkipWhile(b => b.Created != blogPost.Created).Skip(1).FirstOrDefault();
+            BlogPost nextPost = db.BlogPosts.OrderBy(b => b.Created).ToList().SkipWhile(b => b.Created != blogPost.Created).Skip(1).FirstOrDefault();
+
+            if (previousPost == null)
+            {
+                ViewBag.PreviousPost = "No Earlier Posts";
+            }
+            else
+            {
+                ViewBag.PreviousPost = previousPost.Title;
+
+            }
+            if (nextPost == null)
+            {
+                ViewBag.NextPost = "No Newer Post";
+            }
+            else
+            {
+                ViewBag.NextPost = nextPost.Title ?? "No Newer Post";
+            }
+
             if (blogPost == null)
             {
                 return HttpNotFound();
             }
             return View(blogPost);
+        }
+        public ActionResult PreviousPost (bool prev, int id)
+        {
+            if (prev)
+            {
+                BlogPost currentPost = db.BlogPosts.Find(id);
+                BlogPost previousPost = db.BlogPosts.OrderByDescending(b => b.Created).ToList().SkipWhile(b => b.Created != currentPost.Created).Skip(1).FirstOrDefault();
+                if (previousPost == null)
+                {
+                    return RedirectToAction(currentPost.Slug, "Blog/Details");
+                }
+                return RedirectToAction(previousPost.Slug, "Blog/Details");
+            }
+            else
+            {
+                BlogPost currentPost = db.BlogPosts.Find(id);
+                BlogPost nextPost = db.BlogPosts.OrderBy(b => b.Created).ToList().SkipWhile(b => b.Created != currentPost.Created).Skip(1).FirstOrDefault();
+                if (nextPost == null)
+                {
+                    return RedirectToAction(currentPost.Slug, "Blog/Details");
+                }
+                return RedirectToAction(nextPost.Slug, "Blog/Details");
+
+            }
         }
 
        
@@ -51,7 +125,7 @@ namespace BlogLife.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "Title,Body,Abstract,Published")] BlogPost blogPost)
+        public ActionResult Create([Bind(Include = "Title,Body,Abstract,MediaPath,Published")] BlogPost blogPost, HttpPostedFileBase image)
         {
             if (ModelState.IsValid)
             {
@@ -65,6 +139,12 @@ namespace BlogLife.Controllers
                 {
                     ModelState.AddModelError("Title", "The title must be unique");
                     return View(blogPost);
+                }
+                if (ImageUploadValidator.IsWebFriendlyImage(image))
+                {
+                    var fileName = Path.GetFileName(image.FileName);
+                    image.SaveAs(Path.Combine(Server.MapPath("~/Uploads/"), fileName));
+                    blogPost.MediaPath = "/Uploads/" + fileName;
                 }
                 blogPost.Slug = Slug;
                 blogPost.Created = DateTime.Now;
@@ -97,7 +177,7 @@ namespace BlogLife.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "Id,Created,Title,Slug,Body,Abstract,Published")] BlogPost blogPost)
+        public ActionResult Edit([Bind(Include = "Id,Created,Title,Slug,Body,Abstract,MediaPath,Published")] BlogPost blogPost, HttpPostedFileBase image)
         {
             if (ModelState.IsValid)
             {
@@ -114,6 +194,15 @@ namespace BlogLife.Controllers
                          ModelState.AddModelError("Title", "The title must be unique");
                          return View(blogPost);
                 }
+                    if (ImageUploadValidator.IsWebFriendlyImage(image))
+                    {
+                        var fileName = Path.GetFileName(image.FileName);
+                        var justFileName = Path.GetFileNameWithoutExtension(fileName);
+                        justFileName = StringUtilities.URLFriendly(justFileName);
+                        fileName = $"{justFileName}_{DateTime.Now.Ticks}{Path.GetExtension(fileName)}";
+                        image.SaveAs(Path.Combine(Server.MapPath("~/Uploads/"), fileName));
+                        blogPost.MediaPath = "/Uploads/" + fileName;
+                    }
                     blogPost.Slug = slug;
                 }
                 
@@ -126,6 +215,7 @@ namespace BlogLife.Controllers
         }
 
         // GET: BlogPosts/Delete/5
+        [Authorize(Roles = "Admin")]
         public ActionResult Delete(int? id)
         {
             if (id == null)
@@ -143,6 +233,7 @@ namespace BlogLife.Controllers
         // POST: BlogPosts/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public ActionResult DeleteConfirmed(int id)
         {
             BlogPost blogPost = db.BlogPosts.Find(id);

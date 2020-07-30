@@ -7,20 +7,13 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using BlogLife.Models;
+using Microsoft.AspNet.Identity;
 
 namespace BlogLife.Controllers
 {
     public class CommentsController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
-
-        // GET: Comments
-        public ActionResult Index()
-        {
-            var comments = db.Comments.Include(c => c.Author).Include(c => c.BlogPost);
-            return View(comments.ToList());
-        }
-
         // GET: Comments/Details/5
         public ActionResult Details(int? id)
         {
@@ -37,6 +30,7 @@ namespace BlogLife.Controllers
         }
 
         // GET: Comments/Create
+       
         public ActionResult Create()
         {
             ViewBag.AuthorId = new SelectList(db.Users, "Id", "FirstName");
@@ -49,22 +43,23 @@ namespace BlogLife.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "Id,BlogPostId,AuthorId,Body,Created,Updated,UpdateReason")] Comment comment)
+        public ActionResult Create(string body, int blogPostId, string slug)
         {
-            if (ModelState.IsValid)
-            {
+            var comment = new Comment 
+            { 
+                Body = body,
+                Created = DateTime.Now,
+                BlogPostId = blogPostId,
+                AuthorId = User.Identity.GetUserId()
+            };
+
                 db.Comments.Add(comment);
                 db.SaveChanges();
-                return RedirectToAction("Index");
-            }
-
-            ViewBag.AuthorId = new SelectList(db.Users, "Id", "FirstName", comment.AuthorId);
-            ViewBag.BlogPostId = new SelectList(db.BlogPosts, "Id", "Title", comment.BlogPostId);
-            return View(comment);
+                return RedirectToAction("Details", "BlogPosts", new { slug });
         }
 
         // GET: Comments/Edit/5
-        [Authorize(Roles = "Admin, Moderator")]
+        
         public ActionResult Edit(int? id)
         {
             if (id == null)
@@ -100,6 +95,7 @@ namespace BlogLife.Controllers
         }
 
         // GET: Comments/Delete/5
+        [Authorize(Roles = "Admin, Moderator")]
         public ActionResult Delete(int? id)
         {
             if (id == null)
@@ -117,12 +113,13 @@ namespace BlogLife.Controllers
         // POST: Comments/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(int id)
+        [Authorize(Roles = "Admin, Moderator")]
+        public ActionResult DeleteConfirmed(int id, string slug)
         {
             Comment comment = db.Comments.Find(id);
             db.Comments.Remove(comment);
             db.SaveChanges();
-            return RedirectToAction("Index");
+            return RedirectToAction("Details", "BlogPosts", new { slug });
         }
 
         protected override void Dispose(bool disposing)

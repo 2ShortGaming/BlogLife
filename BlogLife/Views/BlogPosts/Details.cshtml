@@ -1,142 +1,146 @@
 ﻿@using BlogLife.Models
-@model  BlogPost
+@using Microsoft.AspNet.Identity
+@model BlogPost
+@{
+    ViewBag.Title = "Details";
+    string prevPost = ViewBag.PreviousPost;
+    string nextPost = ViewBag.NextPost;
+}
 
 <section class="blog-section spad">
     <div class="container">
         <div class="row">
             <div class="col-lg-8">
                 <div class="blog-post single-post">
-                    <img src="img/blog/1.jpg" alt="">
+                    <img src="" alt="">
                     <div class="post-date">@Model.Created.ToString("MMM dd, yyyy")</div>
                     <h3>@Model.Title</h3>
                     <div class="post-metas">
-                        <div class="post-meta">By Brandon Swaney</div>
+                        <div class="post-meta">Brandon Swaney</div>
                         @*<div class="post-meta">in <a href="#">Games</a></div>*@
                         <div class="post-meta">@Model.Comments.Count Comments</div>
                     </div>
                     <p>@Html.Raw(Model.Body)</p>
-                    
+
                     <div class="comments">
                         <h5>Comments (@Model.Comments.Count)</h5>
-                        <ul class="comments-list">
-                            @foreach(var comment in Model.Comments)
-                            {
-                            <li>
-                                <img src="img/author-thumbs/1.jpg" alt="">
-                                <div class="comment-text">
-                                    <h6>@comment.AuthorId<a href="#" class="reply">Reply</a></h6>
-                                    <div class="comment-date">@comment.Created.ToString("MMM dd, yyyy")</div>
-                                    <p>@comment.Body</p>
-                                </div>
-                            </li>
-                            }
-                       </ul> 
-                       
-                        <h5>Leave a comment</h5>
-                        <form class="comment-form">
+                        <div class="container-fluid">
                             <div class="row">
-                                <div class="col-md-6">
-                                    <input type="text" placeholder="Your name">
+                                <div class="col-md-10 col-md-offset-1">
+                                    @foreach (var comment in Model.Comments)
+                                    {
+                                        <p id="comment-@comment.Id">@Html.Raw(comment.Body)</p>
+                                        if (comment.AuthorId != null)
+                                        {
+                                            <p>By: @comment.Author.DisplayName on @comment.Created.ToString("MMM dd, yyyy")</p>
+                                        }
+                                        if (User.IsInRole("Admin") || User.IsInRole("Moderator") || User.Identity.GetUserId() == comment.AuthorId)
+                                        {
+                                            using (Html.BeginForm("Delete", "Comments", FormMethod.Post))
+                                            {
+                                                @Html.AntiForgeryToken()
+                                                @Html.Hidden("Id", comment.Id)
+                                                @Html.Hidden("Slug", Model.Slug)
+                                                <button class="read-more btn btn-dark right" type="submit">Delete</button>
+                                                @Html.ActionLink("Edit", "Edit", "Comments", new { id = comment.Id }, new { @class = "read-more btn btn-dark" })
+                                            }
+                                        }
+                                        <hr />
+                                    }
                                 </div>
-                                <div class="col-md-6">
-                                    <input type="text" placeholder="Your e-mail">
-                                </div>
-                                <div class="col-md-12">
-                                    <textarea placeholder="Your message"></textarea>
-                                    <button class="site-btn">post Comment</button>
-                                </div>
+
                             </div>
-                        </form>
+                        </div>
+
+                        <h5>Leave a comment</h5>
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            using (Html.BeginForm("Create", "Comments", FormMethod.Post))
+                            {
+                                @Html.AntiForgeryToken()
+                                @Html.Hidden("BlogPostId", Model.Id)
+                                @Html.Hidden("Slug", Model.Slug)
+                                <form class="comment-form">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            @Html.TextArea("Body", " ", new { rows = 10, cols = 40 })
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <button class="site-btn" type="submit">Post Comment</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            }
+                        }
                     </div>
+
+
+                    @Html.ActionLink(prevPost, "PreviousPost", "BlogPosts", new { prev = true, id = Model.Id }, new { @class = "site-btn" })
+                    @Html.ActionLink(nextPost, "PreviousPost", "BlogPosts", new { prev = false, id = Model.Id }, new { @class = "site-btn" })
+
                 </div>
             </div>
             <div class="col-lg-4 sidebar">
                 <div class="sb-widget">
-                    <form class="sb-search">
-                        <input type="text" placeholder="Search">
-                    </form>
+                    <br />
+                    <br />
+                    @using (Html.BeginForm("Index", "BlogPosts", FormMethod.Get, htmlAttributes: new { @class = "form" }))
+                    {
+                        <div class="controls controls-row search-row">
+                            <input id="searchStr" name="searchStr" class="input-block-level" type="text" placeholder="Search" />
+                            <button id="searchStr" name="searchStr" class="btn btn-dark" type="submit">
+                                <i class="icon-search">Go</i>
+                            </button>
+                        </div>
+                    }
                 </div>
+
                 <div class="sb-widget">
                     <h2 class="sb-title">Categories</h2>
                     <ul class="sb-cata-list">
-                        <li><a href="">Games<span>20</span></a></li>
-                        <li><a href="">Gaming Tips & Tricks<span>23</span></a></li>
-                        <li><a href="">Online Games<span>25</span></a></li>
-                        <li><a href="">Team Games<span>17</span></a></li>
-                        <li><a href="">Community<span>15</span></a></li>
-                        <li><a href="">Uncategorized<span>22</span></a></li>
+                        <li><a href="">Coding<span>0</span></a></li>
+                        <li><a href="">Tips & Tricks<span>0</span></a></li>
+                        <li><a href="">Community<span>0</span></a></li>
+                        <li><a href="">Projects<span>0</span></a></li>
                     </ul>
                 </div>
-                <div class="sb-widget">
-                    <h2 class="sb-title">Latest News</h2>
-                    <div class="latest-news-widget">
-                        <div class="ln-item">
-                            <img src="img/blog-thumbs/1.jpg" alt="">
-                            <div class="ln-text">
-                                <div class="ln-date">April 1, 2019</div>
-                                <h6>10 Amazing new games</h6>
-                                <div class="ln-metas">
-                                    <div class="ln-meta">By Admin</div>
-                                    <div class="ln-meta">in <a href="#">Games</a></div>
-                                    <div class="ln-meta">3 Comments</div>
+                @*<div class="sb-widget">
+                        <h2 class="sb-title">Project Blogs</h2>
+                        <div class="latest-news-widget">
+                            @foreach (var dot in Model.Skip(12).Take(5))
+                            {
+                                <div class="ln-item">
+                                    <img src="img/blog-thumbs/1.jpg" alt="">
+                                    <div class="ln-text">
+                                        <div class="ln-date">@dot.Created.ToString("MMM dd, yyyy")</div>
+                                        <h6>@dot.Title</h6>
+                                        <div class="ln-metas">
+                                            <div class="ln-meta">Brandon</div>
+                                            <div class="ln-meta">in <a href="#">Projects</a></div>
+                                            <div class="ln-meta">@dot.Comments.Count Comments</div>
+                                            <a href=@Url.Action("Details", "BlogPosts", new { slug = dot.Slug }) class="read-more">Read More</a>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
+                            }
                         </div>
-                        <div class="ln-item">
-                            <img src="img/blog-thumbs/2.jpg" alt="">
-                            <div class="ln-text">
-                                <div class="ln-date">April 1, 2019</div>
-                                <h6>10 Amazing new games</h6>
-                                <div class="ln-metas">
-                                    <div class="ln-meta">By Admin</div>
-                                    <div class="ln-meta">in <a href="#">Games</a></div>
-                                    <div class="ln-meta">3 Comments</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="ln-item">
-                            <img src="img/blog-thumbs/3.jpg" alt="">
-                            <div class="ln-text">
-                                <div class="ln-date">April 1, 2019</div>
-                                <h6>10 Amazing new games</h6>
-                                <div class="ln-metas">
-                                    <div class="ln-meta">By Admin</div>
-                                    <div class="ln-meta">in <a href="#">Games</a></div>
-                                    <div class="ln-meta">3 Comments</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="ln-item">
-                            <img src="img/blog-thumbs/4.jpg" alt="">
-                            <div class="ln-text">
-                                <div class="ln-date">April 1, 2019</div>
-                                <h6>10 Amazing new games</h6>
-                                <div class="ln-metas">
-                                    <div class="ln-meta">By Admin</div>
-                                    <div class="ln-meta">in <a href="#">Games</a></div>
-                                    <div class="ln-meta">3 Comments</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="sb-widget">
-                    <a href="#" class="add">
-                        <img src="img/add-2.jpg" alt="">
-                    </a>
-                </div>
+                    </div>*@
+
+
                 <div class="sb-widget">
                     <h2 class="sb-title">Latest Comments</h2>
                     <div class="latest-comments-widget">
                         @foreach (var com in Model.Comments)
                         {
-                        <div class="lc-item">
-                            <img src="img/author-thumbs/1.jpg" alt="">
-                            <div class="lc-text">
-                                <h6>@com.AuthorId<span> In </span><a href="">Title Name</a></h6>
-                                <div class="lc-date">@com.Created.ToString("MMM dd, yyyy")</div>
+                            <div class="lc-item">
+                                <img src="img/author-thumbs/1.jpg" alt="">
+                                <div class="lc-text">
+                                    <h6>@com.Author.DisplayName<span> In </span><a href="">@Model.Title</a></h6>
+                                    <div class="lc-date">@com.Created.ToString("MMM dd, yyyy")</div>
+                                </div>
                             </div>
-                        </div>
                         }
                     </div>
                 </div>
@@ -144,3 +148,11 @@
         </div>
     </div>
 </section>
+
+@*@using (Html.BeginForm("Create", "Comments", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        @Html.Hidden("BlogPostId", Model.Id)
+        @Html.Hidden("Slug", Model.Slug)
+        @Html.TextArea("CommentBody")
+    }*@

@@ -21,9 +21,11 @@ namespace BlogLife.Models
         public bool Published { get; set; }
         //Nav properties
         public virtual ICollection<Comment> Comments { get; set; }
+        public virtual ICollection<Category> Categories { get; set; }
         public BlogPost() 
                 {
                     Comments = new HashSet<Comment>();
+                    Categories = new HashSet<Category>();
                 }
     }
 }

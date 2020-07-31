@@ -45,6 +45,10 @@ namespace BlogLife.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create(string body, int blogPostId, string slug)
         {
+            if (string.IsNullOrEmpty(body.Trim())) 
+            {
+                return RedirectToAction("Details", "BlogPosts", new { slug });
+            }
             var comment = new Comment 
             { 
                 Body = body,

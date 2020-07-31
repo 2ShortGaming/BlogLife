@@ -5,17 +5,28 @@
 @{
     ViewBag.Title = "Index";
 }
-
-<h2>Index</h2>
 <br />
 <br />
 <br />
+<br />
+<br />
+<br />
+<h2>Blogs</h2>
 <br />
 <p>
     @if (User.IsInRole("Admin"))
     {
         @Html.ActionLink("Create New", "Create", null, new { @class = "btn btn-dark" })
 
+    }
+    @using (Html.BeginForm("Index", "BlogPosts", FormMethod.Get, htmlAttributes: new { @class = "form" }))
+    {
+        <div class="controls controls-row search-row">
+            <input id="searchStr" name="searchStr" class="input-block-level" type="text" placeholder="Search" />
+            <button id="searchStr" name="searchStr" class="btn btn-dark" type="submit">
+                <i class="icon-search">Go</i>
+            </button>
+        </div>
     }
 
 </p>

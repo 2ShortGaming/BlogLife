@@ -59,7 +59,7 @@ namespace BlogLife.Controllers
                     };
                     var svc = new EmailService();
                     await svc.SendAsync(email);
-                    return View(new EmailModel());
+                    return View("Index", "BlogPosts");
                 }
                 catch (Exception ex)
                 {

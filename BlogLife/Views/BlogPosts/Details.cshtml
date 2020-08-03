@@ -12,7 +12,7 @@
         <div class="row">
             <div class="col-lg-8">
                 <div class="blog-post single-post">
-                    <img src="" alt="">
+                    <img src="@Model.MediaPath" alt="">
                     <div class="post-date">@Model.Created.ToString("MMM dd, yyyy")</div>
                     <h3>@Model.Title</h3>
                     <div class="post-metas">
@@ -97,7 +97,7 @@
                     }
                 </div>
 
-                <div class="sb-widget">
+                @*<div class="sb-widget">
                     <h2 class="sb-title">Categories</h2>
                     <ul class="sb-cata-list">
                         <li><a href="">Coding<span>0</span></a></li>
@@ -105,7 +105,7 @@
                         <li><a href="">Community<span>0</span></a></li>
                         <li><a href="">Projects<span>0</span></a></li>
                     </ul>
-                </div>
+                </div>*@
                 @*<div class="sb-widget">
                         <h2 class="sb-title">Project Blogs</h2>
                         <div class="latest-news-widget">
@@ -135,7 +135,7 @@
                         @foreach (var com in Model.Comments)
                         {
                             <div class="lc-item">
-                                <img src="img/author-thumbs/1.jpg" alt="">
+                                <img src="" alt="">
                                 <div class="lc-text">
                                     <h6>@com.Author.DisplayName<span> In </span><a href="">@Model.Title</a></h6>
                                     <div class="lc-date">@com.Created.ToString("MMM dd, yyyy")</div>

@@ -12,15 +12,17 @@
 
     <!-- Google font -->
     <link href="//fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,500,500i,700,700i&display=swap" rel="stylesheet">
-   
+
     <!-- Stylesheets -->
     <link href="~/Content/animate.css" rel="stylesheet" />
     <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
-    <link href="~/Content/font-awesome.min.css" rel="stylesheet" />
     <link href="~/Content/magnific-popup.css" rel="stylesheet" />
     <link href="~/Content/owl.carousel.min.css" rel="stylesheet" />
     <link href="~/Content/slicknav.min.css" rel="stylesheet" />
     <link href="~/Content/PagedList.css" rel="stylesheet" />
+    @*<link href="~/Content/font-awesome.css" rel="stylesheet" />
+    <link href="~/Content/font-awesome.min.css" rel="stylesheet" />*@
+    <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css%22" rel="stylesheet" />
     <!-- Main Stylesheets -->
 
     <link href="~/Content/style.css" rel="stylesheet" />
@@ -48,7 +50,11 @@
             <li><a href=@Url.Action("Index","Home")>Home</a></li>
             <li><a href=@Url.Action("About", "Home")>About</a></li>
             <li><a href=@Url.Action("Contact", "Home")>Contact</a></li>
+            @if (User.IsInRole("Admin"))
+            {
             <li><a href=@Url.Action("Index", "BlogPosts")>Blog</a></li>
+            }
+            
             
         </ul>
         
@@ -62,13 +68,14 @@
     @RenderBody()
 
     <!-- Footer section -->
+
     <div class="footer-section">
         <div class="container">
             <div class="row">
+                <img src="~/Images/bloglogo.png" />
                 <div class="col-lg-3">
                     <div class="footer-widget">
                         <div class="about-widget">
-                            <img src="img/logo.png" alt="">
                             <p>Brandon Swaney<br />(336)460-1802<br />1482 Giles Chapel Rd.<br />Asheboro, NC 27203</p>
                         </div>
                     </div>
@@ -150,12 +157,12 @@
         <div class="social-links-warp">
             <div class="container">
                 <div class="social-links">
-                    <a href="#"><i class="fa fa-instagram"></i><span>instagram</span></a>
-                    <a href="#"><i class="fa fa-github"></i><span>github</span></a>
-                    <a href="#"><i class="fa fa-facebook"></i><span>facebook</span></a>
-                    <a href="#"><i class="fa fa-twitter"></i><span>twitter</span></a>
+                    @*<a href="#"><i class="fa fa-instagram"></i><span>instagram</span></a>*@
+                    <a href="https://github.com/2ShortGaming/BlogLife" target="_blank"><i class="fa fa-github"></i><span>github</span></a>
+                    <a href="https://swaney-portfolio-cf-trn.netlify.app/" target="_blank"><i class="fa fa-facebook"></i><span>portfolio</span></a>
+                    @*<a href="#"><i class="fa fa-twitter"></i><span>twitter</span></a>
                     <a href="#"><i class="fa fa-youtube"></i><span>youtube</span></a>
-                    <a href="#"><i class="fa fa-tumblr-square"></i><span>tumblr</span></a>
+                    <a href="#"><i class="fa fa-tumblr-square"></i><span>tumblr</span></a>*@
                 </div>
             </div>
         </div>

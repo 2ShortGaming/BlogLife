@@ -85,10 +85,15 @@
             <td>
                 @Html.DisplayFor(modelItem => blogPost.Published)
             </td>
-            <td>
+            @if (User.IsInRole("Admin, Moderator"))
+            {
+                <td>
                 @Html.ActionLink("Edit", "Edit", new { id = blogPost.Id }) |
-                @Html.ActionLink("Details", "Details", new { slug = blogPost.Slug }) |
-                @Html.ActionLink("Delete", "Delete", new { id = blogPost.Id })
+                @Html.ActionLink("Delete", "Delete", new { id = blogPost.Id }) |
+                </td>
+            }
+            <td>
+                @Html.ActionLink("Details", "Details", new { slug = blogPost.Slug })
             </td>
         </tr>
     }

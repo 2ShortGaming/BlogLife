@@ -9,7 +9,7 @@ namespace BlogLife.Helpers
 {
     public class ImageUploadValidator
     {
-        public static object IamgeFormat { get; private set; }
+      
 
         public static bool IsWebFriendlyImage(HttpPostedFileBase file)
         {

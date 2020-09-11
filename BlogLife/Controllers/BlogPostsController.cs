@@ -19,7 +19,7 @@ namespace BlogLife.Controllers
         private ApplicationDbContext db = new ApplicationDbContext();
 
         // GET: BlogPosts
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public ActionResult Index(int? page, string searchStr)
         {
             ViewBag.Search = searchStr;

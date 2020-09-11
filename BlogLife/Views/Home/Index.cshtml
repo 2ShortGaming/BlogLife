@@ -88,7 +88,7 @@
                         @foreach (var dot in Model.Skip(1).Take(5))
                         {
                             <div class="ln-item">
-                                <img src="" alt="">
+                                @*<img src="" alt="">*@
                                 <div class="ln-text">
                                     <div class="ln-date">@dot.Created.ToString("MMM dd, yyyy")</div>
                                     <h6>@dot.Title</h6>

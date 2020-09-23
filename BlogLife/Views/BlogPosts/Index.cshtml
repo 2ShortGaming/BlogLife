@@ -11,7 +11,7 @@
 <br />
 <br />
 <br />
-<h2>Blogs</h2>
+<h2 @*style="padding-left:.5em"*@>Blogs</h2>
 <br />
 <p>
     @if (User.IsInRole("Admin"))
@@ -21,7 +21,7 @@
     }
     @using (Html.BeginForm("Index", "BlogPosts", FormMethod.Get, htmlAttributes: new { @class = "form" }))
     {
-        <div class="controls controls-row search-row">
+        <div class="controls controls-row search-row" @*style="padding-left:.5em"*@>
             <input id="searchStr" name="searchStr" class="input-block-level" type="text" placeholder="Search" />
             <button id="searchStr" name="searchStr" class="btn btn-dark" type="submit">
                 <i class="icon-search">Go</i>
@@ -85,16 +85,21 @@
             <td>
                 @Html.DisplayFor(modelItem => blogPost.Published)
             </td>
-            @if (User.IsInRole("Admin, Moderator"))
+            @if (User.IsInRole("Admin")|| User.IsInRole("Moderator"))
             {
-                <td>
-                @Html.ActionLink("Edit", "Edit", new { id = blogPost.Id }) |
-                @Html.ActionLink("Delete", "Delete", new { id = blogPost.Id }) |
-                </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id = blogPost.Id }) |
+            @Html.ActionLink("Delete", "Delete", new { id = blogPost.Id }) |
+            @Html.ActionLink("Details", "Details", new { slug = blogPost.Slug })
+        </td>
             }
+            else
+            {
             <td>
                 @Html.ActionLink("Details", "Details", new { slug = blogPost.Slug })
             </td>
+
+            }
         </tr>
     }
 </table>
